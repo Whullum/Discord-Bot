@@ -2,6 +2,7 @@ from discord.ext import commands, tasks
 from dataclasses import dataclass
 import discord
 import random
+import pytz
 import datetime
 import token_wrapper
 
@@ -24,7 +25,7 @@ async def on_ready():
     #await channel.send("Hello! DMAI is ready!")
 
 # keeps track of the amount of minutes that pass while a session is going on
-@tasks.loop(minutes=SESSION_TIME_REMINDERS, count=2)
+@tasks.loop(minutes=SESSION_TIME_REMINDERS)
 async def break_reminder(ctx):
 
     #ignore the first execution of this command
@@ -42,8 +43,7 @@ async def startsession(ctx):
         return
     
     session.is_active = True
-    session.start_time = ctx.message.created_at.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
-    #human_readable_time = ctx.message.created_at.strftime("%I:%M:%S %p")
+    session.start_time = ctx.message.created_at.astimezone(pytz.timezone('US/Eastern'))
     break_reminder.start(ctx)
     await ctx.send(f"Session started on {session.start_time.strftime("%B %d at %I:%M:%S %p")}")
 
@@ -55,7 +55,7 @@ async def endsession(ctx):
         return
     
     session.is_active = False
-    end_time = ctx.message.created_at.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
+    end_time = ctx.message.created_at.astimezone(pytz.timezone('US/Eastern'))
     duration = end_time - session.start_time
 
     duration_seconds = duration.total_seconds()
