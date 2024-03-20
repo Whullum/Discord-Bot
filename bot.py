@@ -114,7 +114,10 @@ async def d4(ctx, *modifiers):
 async def roll(ctx, dice : str):
     roller_name = ctx.message.author.display_name
     result = rollNdN(dice)
-    await ctx.send(f"**{roller_name}** rolled {result}")
+    if result == -1:
+        await ctx.send("Format has to be in NdN!")
+    else:
+        await ctx.send(f"**{roller_name}** rolled {result}")
 
 @bot.command()
 async def showcommands(ctx):
@@ -150,8 +153,7 @@ def rollNdN(dice : str):
     try:
         rolls, limit = map(int, dice.split('d'))
     except Exception:
-        print('Format has to be in NdN!')
-        return
+        return - 1
 
     return ', '.join(str(random.randint(1, limit)) for r in range(rolls))
 
